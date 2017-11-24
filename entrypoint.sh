@@ -9,7 +9,7 @@ if [ ! -f "/etc/squid/squid.key" ]; then
 fi
 
 if [ ! -f "/etc/squid/squid.conf" ]; then
-  cat | sudo tee /etc/squid/squid.conf <<EOF
+  cat | tee /etc/squid/squid.conf <<EOF
 visible_hostname squid
 
 #Handling HTTP requests
