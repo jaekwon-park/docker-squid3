@@ -1,12 +1,31 @@
 #!/bin/bash
 
 if [ ! -f "/etc/squid/squid.key" ]; then
-  openssl genrsa -out /etc/squid/squid.key 2048
-  openssl req -new -key /etc/squid/squid.key -out /etc/squid/squid.csr -subj "/C=XX/ST=XX/L=squid/O=squid/CN=squid"
-  openssl x509 -req -days 3650 -in /etc/squid/squid.csr -signkey /etc/squid/squid.key -out /etc/squid/squid.crt
-  cat /etc/squid/squid.key /etc/squid/squid.crt | sudo tee /etc/squid/squid.pem
+  openssl genrsa -out /etc/squid/ssl/squid.key 2048
+  openssl req -new -key /etc/squid/ssl/squid.key -out /etc/squid/ssl/squid.csr -subj "/C=XX/ST=XX/L=squid/O=squid/CN=squid"
+  openssl x509 -req -days 3650 -in /etc/squid/ssl/squid.csr -signkey /etc/squid/ssl/squid.key -out /etc/squid/ssl/squid.crt
+  cat /etc/squid/ssl/squid.key /etc/squid/ssl/squid.crt > /etc/squid/ssl/squid.pem
   echo "create squid SSL files."
 fi
+
+if [ -! -d "/usr/local/squid/var/cache" ]; then
+  mkdir -p /usr/local/squid/var/cache
+  chmod -R 777 /usr/local/squid/var/cache
+  echo "create squid cache directory."
+ fi
+
+if [ -! -d "/usr/local/squid/var/logs" ]; then
+  mkdir -p /usr/local/squid/var/logs
+  chmod -R 777 /usr/local/squid/var/logs
+  echo "create squid logs directory."
+ fi
+
+if [ -! -d "/usr/local/squid/var/run" ]; then
+  mkdir -p /usr/local/squid/var/run
+  chmod -R 777 /usr/local/squid/var/run
+  echo "create squid run directory."
+ fi
+
 
 if [ ! -f "/etc/squid/squid.conf" ]; then
   cat | tee /etc/squid/squid.conf <<EOF
@@ -37,7 +56,5 @@ EOF
   echo "create default squid conf."
 fi
 
-
-echo "Starting squid proxy."
-exec /usr/local/squid/sbin/squid -f /etc/squid/squid.conf
-
+echo "Starting squid3..."
+exec /usr/local/squid/sbin/squid -f /etc/squid/squid.conf -NYCd  1
