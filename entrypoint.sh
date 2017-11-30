@@ -1,26 +1,47 @@
 #!/bin/bash
 
+function file_env() {
+  local var="$1"
+  local fileVar="${var}_FILE"
+  local def="${2:-}"
+  if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+    echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+    exit 1
+  fi
+  local val="$def"
+  if [ "${!var:-}" ]; then
+    val="${!var}"
+  elif [ "${!fileVar:-}" ]; then
+    val="$(<"${!fileVar}")"
+  fi
+  export "$var"="$val"
+  unset "$fileVar"
+}
+
+file_env 'HOST_NAME'
+
+
 if [ ! -f "/etc/squid/squid.key" ]; then
   openssl genrsa -out /etc/squid/ssl/squid.key 2048
-  openssl req -new -key /etc/squid/ssl/squid.key -out /etc/squid/ssl/squid.csr -subj "/C=XX/ST=XX/L=squid/O=squid/CN=squid"
+  openssl req -new -key /etc/squid/ssl/squid.key -out /etc/squid/ssl/squid.csr -subj "/C=XX/ST=XX/L=squid/O=squid/CN=$HOST_NAME"
   openssl x509 -req -days 3650 -in /etc/squid/ssl/squid.csr -signkey /etc/squid/ssl/squid.key -out /etc/squid/ssl/squid.crt
   cat /etc/squid/ssl/squid.key /etc/squid/ssl/squid.crt > /etc/squid/ssl/squid.pem
   echo "create squid SSL files."
 fi
 
-if [ -! -d "/usr/local/squid/var/cache" ]; then
+if [ ! -d "/usr/local/squid/var/cache" ]; then
   mkdir -p /usr/local/squid/var/cache
   chmod -R 777 /usr/local/squid/var/cache
   echo "create squid cache directory."
  fi
 
-if [ -! -d "/usr/local/squid/var/logs" ]; then
+if [ ! -d "/usr/local/squid/var/logs" ]; then
   mkdir -p /usr/local/squid/var/logs
   chmod -R 777 /usr/local/squid/var/logs
   echo "create squid logs directory."
  fi
 
-if [ -! -d "/usr/local/squid/var/run" ]; then
+if [ ! -d "/usr/local/squid/var/run" ]; then
   mkdir -p /usr/local/squid/var/run
   chmod -R 777 /usr/local/squid/var/run
   echo "create squid run directory."
@@ -29,7 +50,7 @@ if [ -! -d "/usr/local/squid/var/run" ]; then
 
 if [ ! -f "/etc/squid/squid.conf" ]; then
   cat | tee /etc/squid/squid.conf <<EOF
-visible_hostname squid
+visible_hostname $HOST_NAME
 
 #Handling HTTP requests
 http_port 3129 intercept
