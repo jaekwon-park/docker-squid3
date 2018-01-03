@@ -1,0 +1,17 @@
+version: '2'
+services:
+  proxy:
+    restart: always
+    image: jkpark/docker-squid3
+    network_mode: host
+    volumes:
+      - ./data/squid/:/etc/squid
+      - ./data/squid/var/cache:/usr/local/squid/var/cache
+      - ./data/squid/var/logs:/usr/local/squid/var/logs
+      - ./data/squid/var/run:/usr/local/squid/var/run
+      - /etc/ssl:/etc/ssl:ro
+    ports: # you can comment this out when using the nginx frontend
+      - "3129:3129"
+      - "3130:3130"
+    environment:
+      - HOST_NAME=instance_name
