@@ -18,7 +18,7 @@ node('jenkins-slave') {
 
     stage('Push') {
         withCredentials([usernamePassword(credentialsId: "${DOCKER_ACCOUNT_CREDENTIALS}",passwordVariable: 'PASSWORD',usernameVariable: 'USER')]) {
-          withDockerServer([uri: '$(DOCKER_BASE_URL}']) {
+          withDockerRegistry([uri: '${DOCKER_BASE_URL}']) {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
           }
