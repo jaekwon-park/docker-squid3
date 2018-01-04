@@ -5,6 +5,8 @@ MAINTAINER Jaekwon Park <jaekwon.park@code-post.com>
 ENV VERSION squid-3.5.27
 WORKDIR /usr/local/squid
 
+RUN sed -ie s/archive.ubuntu.com/package.ddb/g /etc/apt/source.list
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends make ca-certificates gcc iptables curl build-essential aptitude libssl-dev openssl libgnutls-dev && \
     aptitude build-dep squid -y .&& apt-get clean && rm -rf /var/lib/apt/lists/* && \
     curl http://www.squid-cache.org/Versions/v3/3.5/squid-3.5.27.tar.gz -o /tmp/squid-3.5.27.tar.gz && \
