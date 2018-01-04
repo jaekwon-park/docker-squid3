@@ -30,9 +30,6 @@ node('jenkins-slave') {
 
           
     }
-    catch (exc) {
-      throw exc
-    }
   }
 }
 
