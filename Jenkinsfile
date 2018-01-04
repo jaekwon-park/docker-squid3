@@ -1,12 +1,12 @@
-node('jenkins-slave') {
+node('${Build-node}') {
   timestamps {
     def app
-    stage('repository checkout') {
+    stage('Checkout') {
         checkout scm
     }
 
     stage('Build') {
-        app = docker.build("${DOCKER_IMAGE_NAME}")
+        app = docker.build("${DOCKER_BASE_URL}/${DOCKER_IMAGE_NAME}")
     }
 
     stage('Test') {
@@ -22,11 +22,12 @@ node('jenkins-slave') {
             app.push("latest")
         }
     }
+
     stage('Scan'){
           withCredentials([usernamePassword(credentialsId: "${DOCKER_ACCOUNT_CREDENTIALS}",passwordVariable: 'PASSWORD',usernameVariable: 'USER')]) {
             sh """
             curl -u "${USER}":"${PASSWORD}" -X POST \
-            https://${DOCKER_BASE_URL}/api/repositories/common/${DOCKER_IMAGE_NAME}/tags/latest/scan -i
+            https://${DOCKER_BASE_URL}/api/repositories/${DOCKER_IMAGE_NAME}/tags/latest/scan -i
             """
           }
     }
