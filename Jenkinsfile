@@ -1,4 +1,4 @@
-node('${Build-node}') {
+node('jenkins-slave') {
   timestamps {
     def app
     stage('Checkout') {
