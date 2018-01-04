@@ -23,10 +23,9 @@ node('jenkins-slave') {
         }
     }
     stage('Scan'){
-        sh '"
-          curl -u "${USER}":"${PASSWORD}" -X POST \
+          sh curl -u "${USER}":"${PASSWORD}" -X POST \
           https://${DOCKER_BASE_URL}/api/repositories/common/coverage_agent/tags/latest/scan -i
-          "'
+          
     }
     catch (exc) {
       throw exc
