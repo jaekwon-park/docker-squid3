@@ -17,18 +17,18 @@ node('jenkins-slave') {
     }
 
     stage('Push') {
-            withCredentials([usernamePassword(credentialsId: "${HARBOR_CRUDENTIAL}",passwordVariable: 'PASSWORD',usernameVariable: 'USER')]) {
+        withCredentials([usernamePassword(credentialsId: "${DOCKER_ACCOUNT_CREDENTIALS}",passwordVariable: 'PASSWORD',usernameVariable: 'USER')]) {
+          withDockerServer([uri: '$(DOCKER_BASE_URL}']) {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
+          }
         }
     }
     stage('Scan'){
           sh """
           curl -u "${USER}":"${PASSWORD}" -X POST \
-          https://${DOCKER_BASE_URL}/api/repositories/common/coverage_agent/tags/latest/scan -i
+          https://${DOCKER_BASE_URL}/api/repositories/common/${DOCKER_IMAGE_NAME}/tags/latest/scan -i
           """
-
-          
     }
   }
 }
