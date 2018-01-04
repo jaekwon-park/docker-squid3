@@ -17,18 +17,18 @@ node('jenkins-slave') {
     }
 
     stage('Push') {
-        withDockerRegistry([uri: '${DOCKER_BASE_URL}']) {
-          withCredentials([usernamePassword(credentialsId: "${DOCKER_ACCOUNT_CREDENTIALS}",passwordVariable: 'PASSWORD',usernameVariable: 'USER')]) {
+        withDockerRegistry([uri: '${DOCKER_BASE_URL}',credentialsId: "${DOCKER_ACCOUNT_CREDENTIALS}"]) {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
-          }
         }
     }
     stage('Scan'){
-          sh """
-          curl -u "${USER}":"${PASSWORD}" -X POST \
-          https://${DOCKER_BASE_URL}/api/repositories/common/${DOCKER_IMAGE_NAME}/tags/latest/scan -i
-          """
+          withCredentials([usernamePassword(credentialsId: "${DOCKER_ACCOUNT_CREDENTIALS}",passwordVariable: 'PASSWORD',usernameVariable: 'USER')]) {
+            sh """
+            curl -u "${USER}":"${PASSWORD}" -X POST \
+            https://${DOCKER_BASE_URL}/api/repositories/common/${DOCKER_IMAGE_NAME}/tags/latest/scan -i
+            """
+          }
     }
   }
 }
