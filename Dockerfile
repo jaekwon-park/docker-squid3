@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM registry.hcdd.kr/ddb_app/ubuntu:16.04
 
 MAINTAINER Jaekwon Park <jaekwon.park@code-post.com>
 
