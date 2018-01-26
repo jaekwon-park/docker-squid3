@@ -1,4 +1,4 @@
-FROM registry.hcdd.kr/ddb_app/ubuntu:16.04
+FROM ubuntu:16.04
 
 MAINTAINER Jaekwon Park <jaekwon.park@code-post.com>
 
@@ -14,7 +14,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     cd /usr/local/squid-3.5.27 && ./configure --with-openssl --enable-async-io --enable-icmp --enable-htpc --enable-ssl-crtd --with-gnutls --with-openssl  && \
     make && make install && make install clean && apt-get purge -y -q --auto-remove make ca-certificates gcc aptitude libssl-dev libgnutls-dev && rm -rf /usr/local/squid-3.5.27
 
-EXPOSE 3128 3129
+EXPOSE 3128 3129 3130
 
 VOLUME /etc/squid/
 
